@@ -1,6 +1,6 @@
 # Flutter Drill-Down Chart
 
-A Flutter application demonstrating a drill-down chart implementation using Syncfusion Flutter Charts. The app shows asset distribution data with the ability to drill down into subcategories.
+A Flutter application demonstrating a drill-down chart implementation using Syncfusion Flutter Charts. The app shows asset distribution data with the ability to drill down into subcategories. (currently still working on the distribution and classification of assets - this is to get a deeper understanding of fintech and you get to see all your investments in ONE DONUT CHART)
 
 ## Features
 
