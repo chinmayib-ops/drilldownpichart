@@ -1,0 +1,14 @@
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/drilldownpichart
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/icudtl.dat
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/lib/libflutter_linux_gtk.so
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.bin.json
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/FontManifest.json
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/fonts/MaterialIcons-Regular.otf
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.bin
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/shaders/ink_sparkle.frag
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/kernel_blob.bin
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/version.json
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.json
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/NOTICES
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf
+/home/yapper/drilldownpichart/build/linux/x64/debug/bundle/data/flutter_assets/NOTICES.Z
