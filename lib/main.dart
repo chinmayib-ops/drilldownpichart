@@ -1,25 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-void main() => runApp(MaterialApp(home: Scaffold(body: DrillDownChart())));
+void main() => runApp(MaterialApp(home: Scaffold(body: ChartToggleDemo())));
 
-class DrillDownChart extends StatefulWidget {
+class ChartToggleDemo extends StatefulWidget {
   @override
-  _DrillDownChartState createState() => _DrillDownChartState();
+  State<ChartToggleDemo> createState() => _ChartToggleDemoState();
 }
 
-class _DrillDownChartState extends State<DrillDownChart> {
-  late List<ChartData> _chartData;
-  late List<ChartData> _subCategoryData;
+class _ChartToggleDemoState extends State<ChartToggleDemo> {
+  bool showPieChart = true;
+  String? selectedCategory;
+  bool isDrilled = false;
   late TooltipBehavior _tooltipBehavior;
-  String? _selectedCategory;
-  bool _isDrilled = false;
 
   @override
   void initState() {
-    _chartData = getChartData();
     _tooltipBehavior = TooltipBehavior(enable: true);
     super.initState();
+  }
+
+  // Data
+  final List<ChartData> topLevelData = [
+    ChartData('Deposit', 51.1, Colors.amber),
+    ChartData('Equities', 21, Colors.blue),
+    ChartData('Insurance', 48.8, Colors.pink),
+    ChartData('GST', 0.1, Colors.red),
+  ];
+
+  final Map<String, List<ChartData>> subCategoryData = {
+    'Deposit': [
+      ChartData('Deposit', 23, Colors.amber),
+      ChartData('Term deposit', 17, Colors.amber.shade300),
+      ChartData('Recurring deposit', 23, Colors.amber.shade600),
+      ChartData('Certificates of deposits', 18, Colors.amber.shade700),
+      ChartData('SIP', 2, Colors.amber.shade800),
+    ],
+    'Equities': [
+      ChartData('Equities', 21, Colors.blue),
+      ChartData('Mutual funds', 17, Colors.blue.shade300),
+      ChartData('Govt. bonds', 0.03, Colors.blue.shade600),
+      ChartData('Infrastructure', 20, Colors.blue.shade900),
+    ],
+    'Insurance': [
+      ChartData('Insurance', 48.8, Colors.pink),
+    ],
+    'GST': [
+      ChartData('GST', 0.1, Colors.red),
+    ],
+  };
+
+  List<ChartData> get currentData =>
+      isDrilled && selectedCategory != null
+          ? subCategoryData[selectedCategory!] ?? []
+          : topLevelData;
+
+  String get chartTitle =>
+      isDrilled && selectedCategory != null
+          ? '$selectedCategory Breakdown'
+          : 'Asset Allocation';
+
+  double get totalAssets =>
+      (isDrilled && selectedCategory != null
+          ? subCategoryData[selectedCategory!] ?? []
+          : topLevelData)
+      .fold(0, (sum, item) => sum + item.y);
+
+  void drillDown(String category) {
+    if (subCategoryData.containsKey(category)) {
+      setState(() {
+        selectedCategory = category;
+        isDrilled = true;
+      });
+    }
+  }
+
+  void drillUp() {
+    setState(() {
+      selectedCategory = null;
+      isDrilled = false;
+    });
   }
 
   @override
@@ -28,59 +88,44 @@ class _DrillDownChartState extends State<DrillDownChart> {
       child: Column(
         children: [
           const SizedBox(height: 24),
+          // Toggle Buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () => setState(() => showPieChart = true),
+                child: const Text('Pie Chart'),
+                style: TextButton.styleFrom(
+                  foregroundColor: showPieChart ? Colors.blue : Colors.grey,
+                ),
+              ),
+              TextButton(
+                onPressed: () => setState(() => showPieChart = false),
+                child: const Text('Asset Chart'),
+                style: TextButton.styleFrom(
+                  foregroundColor: !showPieChart ? Colors.blue : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
-            _isDrilled ? '$_selectedCategory Details' : 'Asset Classes',
+            chartTitle,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Expanded(
-            child: SfCircularChart(
-              title: ChartTitle(
-                text: _isDrilled ? '$_selectedCategory Breakdown' : 'Asset Distribution',
-                textStyle: const TextStyle(fontSize: 16),
-              ),
-              legend: Legend(isVisible: true),
-              tooltipBehavior: _tooltipBehavior,
-              series: <CircularSeries>[
-                DoughnutSeries<ChartData, String>(
-                  dataSource: _isDrilled ? _subCategoryData : _chartData,
-                  xValueMapper: (ChartData data, _) => data.x,
-                  yValueMapper: (ChartData data, _) => data.y,
-                  dataLabelSettings: const DataLabelSettings(
-                    isVisible: true,
-                    labelPosition: ChartDataLabelPosition.outside,
-                    textStyle: TextStyle(fontSize: 12),
-                  ),
-                  enableTooltip: true,
-                  pointColorMapper: (ChartData data, _) => data.color,
-                  explode: true,
-                  explodeIndex: _isDrilled ? 0 : null,
-                  onPointTap: (ChartPointDetails details) {
-                    if (!_isDrilled) {
-                      final category = _chartData[details.pointIndex!].x;
-                      setState(() {
-                        _selectedCategory = category;
-                        _subCategoryData = getSubCategoryData(category);
-                        _isDrilled = true;
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
+            child: showPieChart
+                ? _buildPieChart()
+                : _buildBarChart(),
           ),
-          if (_isDrilled)
+          if (isDrilled)
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: TextButton.icon(
-                onPressed: () {
-                  setState(() {
-                    _isDrilled = false;
-                    _selectedCategory = null;
-                  });
-                },
+                onPressed: drillUp,
                 icon: const Icon(Icons.arrow_back),
-                label: const Text('Back to Asset Classes'),
+                label: const Text('Back'),
               ),
             ),
         ],
@@ -88,43 +133,91 @@ class _DrillDownChartState extends State<DrillDownChart> {
     );
   }
 
-  List<ChartData> getChartData() {
-    return <ChartData>[
-      ChartData('Deposit', 51.1, Colors.amber),
-      ChartData('Equities', 0.0, Colors.blue),
-      ChartData('Insurance', 48.8, Colors.pink),
-      ChartData('GST', 0.1, Colors.red),
-    ];
+  Widget _buildPieChart() {
+    return SfCircularChart(
+      annotations: <CircularChartAnnotation>[
+        CircularChartAnnotation(
+          widget: Text(
+            'Total\n${totalAssets.toStringAsFixed(2)}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+      ],
+      tooltipBehavior: _tooltipBehavior,
+      legend: Legend(isVisible: true),
+      series: <DoughnutSeries<ChartData, String>>[
+        DoughnutSeries<ChartData, String>(
+          dataSource: currentData,
+          xValueMapper: (ChartData data, _) => data.x,
+          yValueMapper: (ChartData data, _) => data.y,
+          pointColorMapper: (ChartData data, _) => data.color,
+          dataLabelSettings: const DataLabelSettings(
+            isVisible: true,
+            labelPosition: ChartDataLabelPosition.outside,
+            textStyle: TextStyle(fontSize: 12),
+          ),
+          enableTooltip: true,
+          explode: true,
+          onPointTap: (ChartPointDetails details) {
+            if (!isDrilled) {
+              final tapped = currentData[details.pointIndex!].x;
+              drillDown(tapped);
+            }
+          },
+        ),
+      ],
+    );
   }
 
-  List<ChartData> getSubCategoryData(String category) {
-    switch (category) {
-      case 'Deposit':
-        return <ChartData>[
-          ChartData('Deposit', 25.0, Colors.amber),
-          ChartData('Term deposit', 15.0, Colors.amber.shade300),
-          ChartData('Recurring deposit', 11.1, Colors.amber.shade600),
-        ];
-      case 'Equities':
-        return <ChartData>[
-          ChartData('Equities', 0.0, Colors.blue),
-          ChartData('ETF', 0.0, Colors.blue.shade300),
-          ChartData('Mutual funds', 0.0, Colors.blue.shade600),
-          ChartData('Govt. bonds', 0.0, Colors.blue.shade900),
-          ChartData('Bonds', 0.0, Colors.blue.shade700),
-          ChartData('Debentures', 0.0, Colors.blue.shade500),
-        ];
-      case 'Insurance':
-        return <ChartData>[
-          ChartData('Insurance', 48.8, Colors.pink),
-        ];
-      case 'GST':
-        return <ChartData>[
-          ChartData('GST', 0.1, Colors.red),
-        ];
-      default:
-        return <ChartData>[];
-    }
+  Widget _buildBarChart() {
+    return Column(
+      children: [
+        Text(
+          'Total: ${totalAssets.toStringAsFixed(2)}',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SfCartesianChart(
+              tooltipBehavior: _tooltipBehavior,
+              primaryXAxis: CategoryAxis(
+                labelStyle: const TextStyle(fontSize: 12),
+                majorGridLines: const MajorGridLines(width: 0),
+              ),
+              primaryYAxis: NumericAxis(
+                minimum: 0,
+                maximum: 100,
+                interval: 10,
+                labelFormat: '{value}%',
+                labelStyle: const TextStyle(fontSize: 12),
+              ),
+              series: <BarSeries<ChartData, String>>[
+                BarSeries<ChartData, String>(
+                  dataSource: currentData,
+                  xValueMapper: (ChartData data, _) => data.x,
+                  yValueMapper: (ChartData data, _) => data.y,
+                  pointColorMapper: (ChartData data, _) => data.color,
+                  dataLabelSettings: const DataLabelSettings(
+                    isVisible: true,
+                    textStyle: TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                  borderRadius: BorderRadius.circular(6),
+                  width: 0.6,
+                  onPointTap: (ChartPointDetails details) {
+                    if (!isDrilled) {
+                      final tapped = currentData[details.pointIndex!].x;
+                      drillDown(tapped);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
