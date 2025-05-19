@@ -1,15 +1,15 @@
 # Flutter Drill-Down Chart
 
-A Flutter application demonstrating a drill-down chart implementation using Syncfusion Flutter Charts. The app shows asset distribution data with the ability to drill down into subcategories. (currently still working on the distribution and classification of assets - this is to get a deeper understanding of fintech and you get to see all your investments in ONE DONUT CHART)
+A Flutter application demonstrating both a **drill-down pie chart** and an **interactive asset allocation bar chart** using Syncfusion Flutter Charts. You can toggle between the two chart types and drill down into subcategories by tapping on segments or bars.
 
 ## Features
 
-- Interactive doughnut chart showing asset distribution
-- Drill-down functionality to view subcategories
-- Smooth animations and transitions
+- Toggle between Pie Chart and Bar Chart views (NEW: Bar Chart added!)
+- Drill-down functionality for both charts
+- Total assets displayed in the center of the pie chart and above the bar chart
 - Tooltips and data labels
-- Color-coded segments
-- Legend support
+- Color-coded segments and bars
+- Responsive and interactive UI
 
 ## Getting Started
 
@@ -17,40 +17,36 @@ A Flutter application demonstrating a drill-down chart implementation using Sync
 
 - Flutter SDK
 - Dart SDK
-- Android Studio / VS Code
 
 ### Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/drilldownpichart.git
-```
+   ```bash
+   git clone https://github.com/chinmayib-ops/drilldownpichart.git
+   cd drilldownpichart
+   ```
 
-2. Navigate to the project directory:
-```bash
-cd drilldownpichart
-```
+2. Install dependencies:
+   ```bash
+   flutter pub get
+   ```
 
-3. Install dependencies:
-```bash
-flutter pub get
-```
-
-4. Run the app:
-```bash
-flutter run
-```
-
-## Dependencies
-
-- syncfusion_flutter_charts: ^29.1.38
+3. Run the app:
+   ```bash
+   flutter run
+   ```
 
 ## Usage
 
-1. The main screen shows the asset distribution in a doughnut chart
-2. Tap on any segment to drill down into its subcategories
-3. Use the back button to return to the main view
+- Use the toggle buttons at the top to switch between Pie Chart and the new Asset Bar Chart.
+- Tap a segment/bar to drill down into subcategories.
+- Tap the **Back** button to return to the main view.
+- The total assets are shown in the center of the pie chart and above the bar chart.
+
+## Dependencies
+
+- [syncfusion_flutter_charts](https://pub.dev/packages/syncfusion_flutter_charts)
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
